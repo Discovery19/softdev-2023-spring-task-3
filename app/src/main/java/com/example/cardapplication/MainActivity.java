@@ -9,19 +9,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.cardapplication.R.id;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements Adapter.ItemClickListener {
+    FirebaseFirestore firestore;
     FrameLayout frameLayout;
     CardFragment cardFragment;
     RecyclerView recyclerView;
@@ -34,93 +37,49 @@ public class MainActivity extends AppCompatActivity implements Adapter.ItemClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //getSupportActionBar().hide();
+//        fav.findViewById(id.favourite);
+//        scan.findViewById(id.scanner);
+//        menu.findViewById(id.menu);
 
 
-//        recyclerView = findViewById(id.recyclerView);
-//        //LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        adapter = new Adapter(this, catNames);
-//        recyclerView.setAdapter(adapter);
+        firestore=FirebaseFirestore.getInstance();
 
-        RecyclerView recyclerView = findViewById(id.recyclerView);
+        Map<String,Object> users=new HashMap<>();
+        users.put("first name","qwe");
+        users.put("second name", "asd");
+        firestore.collection("users").add(users).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                Toast.makeText(getApplicationContext(), "Sucess", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Fail", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        recyclerView = findViewById(id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new Adapter(this, catNames);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
-//        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-//            @Override
-//            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-//                return false;
-//            }
-//
-//            @Override
-//            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-//                setFragment(cardFragment);
-//            }
-//
-//            @Override
-//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-//
-//            }
-//        });
-        //for list view
-        //RecyclerView recyclerView=findViewById(id.recyclerView);
-//        ListView listView = findViewById(R.id.listView);
 
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-//                android.R.layout.simple_list_item_1, catNames);
-//        Adapter adapter1=new Adapter() {
-//            @NonNull
-//            @Override
-//            public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//                recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-//                    @Override
-//                    public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-//
-//                    }
-//                });
-//                return null;
-//            }
-//
-//            @Override
-//            public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-//
-//            }
-//
-//            @Override
-//            public int getItemCount() {
-//                return 0;
-//            }
-//        };
-//        listView.setAdapter(adapter);
         frameLayout = findViewById(R.id.framelayout);
         cardFragment = new CardFragment();
-        //listView.setOnItemClickListener((adapterView, view, i, l) -> setFragment(cardFragment));
     }
 
     public void startFavourite(View view) {
-        Intent intent = new Intent(this, favourite_cards.class);
+        Intent intent = new Intent(this, Favourite_cards.class);
         startActivity(intent);
     }
-
     public void startScanner(View view) {
-        Intent intent = new Intent(this, scanner.class);
+        Intent intent = new Intent(this, Scanner.class);
         startActivity(intent);
     }
 
     public void startMenu(View view) {
-        Intent intent = new Intent(this, menu.class);
+        Intent intent = new Intent(this, LogOut.class);
         startActivity(intent);
     }
 
@@ -136,10 +95,4 @@ public class MainActivity extends AppCompatActivity implements Adapter.ItemClick
         setFragment(cardFragment);
         Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
-//    public void closeFragment(Fragment fragment){
-//        FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
-//        fragmentTransaction.remove(fragment);
-//        fragmentTransaction.addToBackStack(null);
-//        fragmentTransaction.commit();
-//    }
 }

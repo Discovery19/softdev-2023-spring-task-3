@@ -4,14 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".favourite_cards">
+    tools:context=".Favourite_cards">
 
-    <TextView
-        android:id="@+id/textView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cards"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="TextView"
-        android:textSize="60sp"
-        tools:layout_editor_absoluteX="170dp"
-        tools:layout_editor_absoluteY="133dp" />
+        />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

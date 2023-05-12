@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,7 +19,9 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="0px"
-            android:layout_weight="5" />
+            android:layout_weight="5">
+
+        </androidx.recyclerview.widget.RecyclerView>
 
         <TableRow
             android:id="@+id/tableRow"
@@ -64,6 +66,7 @@
                 tools:ignore="TouchTargetSizeCheck,VisualLintButtonSize" />
 
         </TableRow>
+
     </LinearLayout>
 
     <FrameLayout
