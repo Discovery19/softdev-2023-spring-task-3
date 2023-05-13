@@ -87,7 +87,6 @@ public class Scanner extends AppCompatActivity {
     CardSave cardSave;
     private CodeScanner mCodeScanner;
     String res="nothing";
-    Button test;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

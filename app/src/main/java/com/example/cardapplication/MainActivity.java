@@ -42,22 +42,22 @@ public class MainActivity extends AppCompatActivity implements Adapter.ItemClick
 //        menu.findViewById(id.menu);
 
 
-        firestore=FirebaseFirestore.getInstance();
-
-        Map<String,Object> users=new HashMap<>();
-        users.put("first name","qwe");
-        users.put("second name", "asd");
-        firestore.collection("users").add(users).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Toast.makeText(getApplicationContext(), "Sucess", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Fail", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        firestore=FirebaseFirestore.getInstance();
+//
+//        Map<String,Object> users=new HashMap<>();
+//        users.put("first name","qwe");
+//        users.put("second name", "asd");
+//        firestore.collection("users").add(users).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//            @Override
+//            public void onSuccess(DocumentReference documentReference) {
+//                Toast.makeText(getApplicationContext(), "Sucess", Toast.LENGTH_SHORT).show();
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(getApplicationContext(), "Fail", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         recyclerView = findViewById(id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
