@@ -42,12 +42,7 @@ public class Fav_Adapter extends RecyclerView.Adapter<Fav_Adapter.ViewHolder> {
             super(itemView);
             textView=itemView.findViewById(R.id.table_name);
             imageButton=itemView.findViewById(R.id.table_menu);
-            //itemView.setOnClickListener(this);
         }
-//        @Override
-//        public void onClick(View view) {
-//            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-//        }
     }
     String getItem(int id) {
         return data[id];

@@ -3,7 +3,9 @@ package com.example.cardapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,11 +14,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Register extends AppCompatActivity {
     TextInputEditText editTextemail, editTextPassword;
@@ -60,7 +70,7 @@ public class Register extends AppCompatActivity {
             if (email.isEmpty())
                 Toast.makeText(Register.this, "Enter email", Toast.LENGTH_SHORT).show();
             if (password.isEmpty())
-                Toast.makeText(Register.this, "Enter email", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Register.this, "Enter password", Toast.LENGTH_SHORT).show();
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
@@ -68,14 +78,38 @@ public class Register extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(Register.this, "Authentication success.",
                                     Toast.LENGTH_SHORT).show();
+                            SharedPreferences sharedPreferences =  getSharedPreferences("Login", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor=sharedPreferences.edit();
+                            editor.putBoolean("loginCheck",true).commit();
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(intent);
                             finish();
+                            addToUsersList(email);
                         } else {
                             Toast.makeText(Register.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
+        });
+    }
+    private  void addToUsersList(String email){
+        Map<String, List<String>> info=new HashMap<>();
+        List<String> mapList=new ArrayList<>();
+        mapList.add(email);
+        info.put("key",mapList);
+        info.put("friends",new ArrayList<>());
+        FirebaseFirestore db;
+        db=FirebaseFirestore.getInstance();
+        db.collection(email).document("info").set(info).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Fail", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

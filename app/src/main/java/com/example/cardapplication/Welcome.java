@@ -2,7 +2,9 @@ package com.example.cardapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +25,15 @@ FirebaseAuth firebaseAuth;
     void checkAuth(){
         Intent intent;
         System.out.println("идет проверка");
-        if (firebaseAuth.getCurrentUser()==null){
+        SharedPreferences sharedPreferences =  getSharedPreferences("Login", Context.MODE_PRIVATE);
+        boolean check=false;
+        try {
+            check=sharedPreferences.getAll().containsKey("loginCheck");
+        }
+        catch (Exception e){
+        }
+
+        if (check==false){
 
             intent= new Intent(this, Login.class);
         }
