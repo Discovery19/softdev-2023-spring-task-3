@@ -93,23 +93,35 @@ public class Register extends AppCompatActivity {
         });
     }
     private  void addToUsersList(String email){
-        Map<String, List<String>> info=new HashMap<>();
-        List<String> mapList=new ArrayList<>();
-        mapList.add(email);
-        info.put("key",mapList);
-        info.put("friends",new ArrayList<>());
-        FirebaseFirestore db;
-        db=FirebaseFirestore.getInstance();
-        db.collection(email).document("info").set(info).addOnSuccessListener(new OnSuccessListener<Void>() {
+        Map<String, Boolean> info=new HashMap<>();
+        info.put("test_friend",true);
+        FirebaseFirestore db=FirebaseFirestore.getInstance();
+        db.collection(email).document("friends")
+                .collection("friends_collection").add(info).addOnSuccessListener(new OnSuccessListener (){
+                    @Override
+                    public void onSuccess(Object o) {
+                        System.out.println("зарегистрирован + создан файл");
+                        Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
+                    }
+    });
+        Map<String, Integer> card=new HashMap<>();
+        card.put("test_friend",123456);
+        db.collection(email).document("card")
+                .collection("card_collection").add(card).addOnSuccessListener(new OnSuccessListener (){
+                    @Override
+                    public void onSuccess(Object o) {
+                        System.out.println("зарегистрирован + создан файл");
+                        Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        Map<String,Boolean> user=new HashMap<>();
+        user.put(email,true);
+        db.collection("users").document(email).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
+                System.out.println("вроде + юзер");
                 Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Fail", Toast.LENGTH_SHORT).show();
-            }
         });
-    }
+}
 }

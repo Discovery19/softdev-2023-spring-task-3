@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-public class MainActivity extends AppCompatActivity implements Adapter.ItemClickListener {
+public class MainActivity extends Menu implements Adapter.ItemClickListener {
     FrameLayout frameLayout;
     CardFragment cardFragment;
     RecyclerView recyclerView;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements Adapter.ItemClick
         setCollection();
         eventChangeListener();
     }
+
     public void  eventChangeListener(){
         DocumentReference docRef = db.collection("users").document("users");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
