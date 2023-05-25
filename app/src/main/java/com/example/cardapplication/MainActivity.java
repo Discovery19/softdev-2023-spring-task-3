@@ -22,9 +22,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,54 +51,29 @@ public class MainActivity extends Menu implements Adapter.ItemClickListener {
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(id.recyclerView);
         db=FirebaseFirestore.getInstance();
-        setCollection();
+//        setCollection();
         eventChangeListener();
     }
 
-    public void  eventChangeListener(){
-        DocumentReference docRef = db.collection("users").document("users");
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    public void  eventChangeListener() {
+        FirebaseAuth auth=FirebaseAuth.getInstance();
+        db.collection(auth.getCurrentUser().getEmail())
+                .document("friends").collection("friends_collection")
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        String str = document.getData().values().toString();
-                        str= str.replaceAll("[\\[\\] ]", "");
-                        List<String> dataList = List.of(str.split(","));
-                        for (int i=0;i<dataList.size();i++) System.out.println(dataList.get(i));
+                    List<String> list = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        list.add(document.getId());
                         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                        adapter = new MainAdapter(getApplicationContext(),dataList);
+                        adapter = new MainAdapter(getApplicationContext(), list);
                         recyclerView.setAdapter(adapter);
-                    } else {
-                        Log.d(TAG, "No such document");
                     }
+                    Log.d(TAG, list.toString());
                 } else {
-                    Log.d(TAG, "get failed with ", task.getException());
+                    Log.d(TAG, "Error getting documents: ", task.getException());
                 }
-            }
-        });
-
-
-    }
-    public void setCollection(){
-        Map <String,List<String>> users=new HashMap<>();
-        List<String> mapList=new ArrayList<>();
-        mapList.add("someemail@gmail.com");
-        mapList.add("someemail2@gmail.com");
-        mapList.add("someemail3@gmail.com");
-        mapList.add("someemail4@gmail.com");
-        users.put("users list",mapList);
-        db.collection("users").document("users").set(users).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Toast.makeText(getApplicationContext(), "ура победа", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Fail", Toast.LENGTH_SHORT).show();
             }
         });
     }

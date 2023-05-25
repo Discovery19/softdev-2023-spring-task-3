@@ -1,63 +1,83 @@
 package com.example.cardapplication;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Toast;
+import android.widget.ImageButton;
 
-import java.lang.reflect.Array;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Favourite_cards extends AppCompatActivity {
+    FirebaseFirestore db;
     RecyclerView recyclerView;
     RecyclerAdapter recyclerAdapter;
-    SharedPreferences sharedPreferences;
     FrameLayout frameLayout;
+    Context context;
+    List<String> names = new ArrayList<>();
+    List<String> codes = new ArrayList<>();
+    ImageButton imageButton;
+    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favourite_cards);
+        db = FirebaseFirestore.getInstance();
+        names = new ArrayList<>();
+        names.add("");
+        codes = new ArrayList<>();
         recyclerView = findViewById(R.id.cards);
-        frameLayout = findViewById(R.id.barcode_frame);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        frameLayout = findViewById(R.id.barcode_frame);
         recyclerAdapter = new RecyclerAdapter(this);
-        recyclerView.setAdapter(recyclerAdapter);
+        recyclerAdapter.setContext(this);// добавленная строка
         initMovies();
-
     }
 
-    void initMovies() {
-        List<String> names = new ArrayList<>();
-        List<String> codes = new ArrayList<>();
-        sharedPreferences = getApplicationContext().getSharedPreferences("My user", Context.MODE_PRIVATE);
-        Set<String> set = sharedPreferences.getAll().keySet();
-        for (String x : set) {
-            names.add(x);
-        }
-        Collection<String> set2= (Collection<String>) sharedPreferences.getAll().values();
-        for (String x:set2) codes.add(x);
-        recyclerAdapter.updateMovieList(names);
-        recyclerAdapter.setSharedPreferences(sharedPreferences,codes);
+    private void initMovies() {
+        System.out.println("4");
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        db.collection(auth.getCurrentUser().getEmail())
+                .document("card").collection("card_collection")
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            names = new ArrayList<>();
+                            codes = new ArrayList<>();
+                            for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                names.add(document.getId());
+                                codes.add(document.getString(document.getId()));
+                                System.out.println(document.getString(document.getId()));
+                            }
+                            Log.d(TAG, names.toString());
+                            if (!names.isEmpty() && !codes.isEmpty()) {
+                                recyclerAdapter.updateMovieList(names);
+                                recyclerAdapter.updateCodeList(codes);
+                                recyclerView.setAdapter(recyclerAdapter);
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
-
-    void delete(String string) {
-        SharedPreferences sp = getApplicationContext().getSharedPreferences("My user", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.remove(string);
-        editor.commit();
-        Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
     }
-}

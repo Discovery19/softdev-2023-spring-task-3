@@ -32,12 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CardSave extends Fragment implements View.OnClickListener {
+public class CardSave extends Fragment {
     String string;
     CardSave(String string){
         this.string=string;
     }
-    Button save;
+    Button save,back;
     EditText cardCode,cardName;
     SharedPreferences sharedPreferences;
     String nameString,codeString;
@@ -45,26 +45,27 @@ public class CardSave extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_card_save, container, false);
+        back=v.findViewById(R.id.dontSave);
         cardCode = v.findViewById(R.id.card_numb);
         cardName = v.findViewById(R.id.card_name);
         save = v.findViewById(R.id.saveButton);
         cardCode.setText(string);
         sharedPreferences= getActivity().getSharedPreferences("My user",Context.MODE_PRIVATE);
-        save.setOnClickListener(this::onClick);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nameString=cardName.getText().toString();
+                codeString=cardCode.getText().toString();
+                addCard();
+            }
+        });
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().getSupportFragmentManager().beginTransaction().remove(CardSave.this).commit();
+            }
+        });
         return v;
-    }
-
-    @Override
-    public void onClick(View view) {
-        nameString=cardName.getText().toString();
-        codeString=cardCode.getText().toString();
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(nameString, codeString);
-        editor.commit();
-        Toast.makeText(getActivity(), "Saved", Toast.LENGTH_SHORT).show();
-        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
-        addCard();
-
     }
     private void addCard(){
         FirebaseAuth auth=FirebaseAuth.getInstance();
@@ -72,16 +73,12 @@ public class CardSave extends Fragment implements View.OnClickListener {
         FirebaseFirestore db=FirebaseFirestore.getInstance();
         Map<String,String> map=new HashMap<>();
         map.put(nameString,codeString);
-        db.collection(email).document("cards").set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection(email).document("card").collection("card_collection").document(nameString).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Toast.makeText(getActivity(), "ура победа должны появиться карты", Toast.LENGTH_LONG).show();
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getActivity(), "Fail", Toast.LENGTH_SHORT).show();
-            }
         });
+        getActivity().getSupportFragmentManager().beginTransaction().remove(CardSave.this).commit();
     }
 }
