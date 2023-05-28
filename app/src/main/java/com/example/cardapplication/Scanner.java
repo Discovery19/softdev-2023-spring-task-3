@@ -1,47 +1,51 @@
-//package com.example.cardapplication;
+package com.example.cardapplication;
 //
 //import androidx.annotation.NonNull;
 //import androidx.appcompat.app.AppCompatActivity;
+//import androidx.fragment.app.Fragment;
+//import androidx.fragment.app.FragmentTransaction;
 //
-//import android.content.Context;
-//import android.content.Intent;
-//import android.graphics.Camera;
-//import android.hardware.camera2.CameraManager;
 //import android.os.Bundle;
-//import android.provider.MediaStore;
-//import android.util.Log;
 //import android.view.View;
+//
+//import android.widget.FrameLayout;
 //import android.widget.Toast;
 //
 //import com.budiyev.android.codescanner.CodeScanner;
 //import com.budiyev.android.codescanner.CodeScannerView;
 //import com.budiyev.android.codescanner.DecodeCallback;
-//import com.budiyev.android.codescanner.ScanMode;
 //import com.google.zxing.Result;
 //
-//public class scanner extends AppCompatActivity {
+//public class Scanner extends AppCompatActivity {
+//    FrameLayout frameLayout;
+//    CardSave cardSave;
 //    private CodeScanner mCodeScanner;
-//    //Context context;
-//
+//    String res="nothing";
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        setContentView(R.layout.activity_scanner);
 //        CodeScannerView scannerView = findViewById(R.id.scanner);
 //        mCodeScanner = new CodeScanner(this, scannerView);
-//        //        mCodeScanner.setCamera(CodeScanner.CAMERA_BACK);
-//        //mCodeScanner.setScanMode(ScanMode.CONTINUOUS);
-//        //mCodeScanner.setAutoFocusEnabled(true);
-//        //mCodeScanner.getAutoFocusMode();
+//        frameLayout = findViewById(R.id.frame);
+//        mCodeScanner.getScanMode();
 //        mCodeScanner.setDecodeCallback(new DecodeCallback() {
 //            @Override
 //            public void onDecoded(@NonNull final Result result) {
 //                runOnUiThread(new Runnable() {
 //                    @Override
 //                    public void run() {
-//                        Toast.makeText(scanner.this, result.getText(), Toast.LENGTH_SHORT).show();
+//                        setResult(result.getText());
+//                        Toast.makeText(Scanner.this, getResult(), Toast.LENGTH_SHORT).show();
+//                        cardSave=new CardSave(getResult());
+//                        setFragment(cardSave);
+//                        mCodeScanner.stopPreview();
+//
 //                    }
 //                });
+//
 //            }
 //        });
 //        scannerView.setOnClickListener(new View.OnClickListener() {
@@ -51,83 +55,143 @@
 //            }
 //        });
 //    }
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        mCodeScanner.startPreview();
+//    String getResult(){
+//        return this.res;
 //    }
-//
-//    @Override
-//    protected void onPause() {
-//        mCodeScanner.releaseResources();
-//        super.onPause();
+//    public void setFragment(Fragment fragment) {
+//        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+//        fragmentTransaction.replace(R.id.frame, fragment);
+//        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.commit();
+//    }
+//    void setResult(String res){
+//        this.res=res;
 //    }
 //}
-package com.example.cardapplication;
+
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.budiyev.android.codescanner.ErrorCallback;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.zxing.Result;
 
 public class Scanner extends AppCompatActivity {
-    FrameLayout frameLayout;
-    CardSave cardSave;
+    private static final String TAG = Scanner.class.getSimpleName();
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+
     private CodeScanner mCodeScanner;
-    String res="nothing";
+    private CodeScannerView mScannerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
-        CodeScannerView scannerView = findViewById(R.id.scanner);
-        mCodeScanner = new CodeScanner(this, scannerView);
-        frameLayout = findViewById(R.id.frame);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mScannerView = findViewById(R.id.scanner);
+        mCodeScanner = new CodeScanner(this, mScannerView);
+
         mCodeScanner.setDecodeCallback(new DecodeCallback() {
             @Override
             public void onDecoded(@NonNull final Result result) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setResult(result.getText());
-                        Toast.makeText(Scanner.this, getResult(), Toast.LENGTH_SHORT).show();
-                        cardSave=new CardSave(getResult());
+                System.out.println("нихуя декодировалось");
+                System.out.println(result.getBarcodeFormat());
+                // Handle the decoded result
+                Log.d(TAG, "Scanned: " + result.getText());
+                //Toast.makeText(Scanner.this, result.toString(), Toast.LENGTH_SHORT).show();
+                        CardSave cardSave=new CardSave(result+"//codeType:"+result.getBarcodeFormat());
                         setFragment(cardSave);
-                        mCodeScanner.stopPreview();
-
-                    }
-                });
-
             }
         });
-        scannerView.setOnClickListener(new View.OnClickListener() {
+        mCodeScanner.setErrorCallback(new ErrorCallback() {
             @Override
-            public void onClick(View view) {
-                mCodeScanner.startPreview();
+            public void onError(@NonNull Throwable thrown) {
+                Log.e(TAG, "Error: " + thrown.getMessage());
             }
         });
+
+        checkCameraPermission(getApplicationContext());
     }
-    String getResult(){
-        return this.res;
-    }
-    public void setFragment(Fragment fragment) {
+        public void setFragment(Fragment fragment) {
+            System.out.println("ставится фрагмент");
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
-    void setResult(String res){
-        this.res=res;
+
+//    public void createScannerView(ViewGroup container, Context context) {
+//        View view = LayoutInflater.from(context).inflate(R.layout.activity_scanner, container, false);
+//        mScannerView = view.findViewById(R.id.scanner);
+//        mCodeScanner = new CodeScanner(context, mScannerView);
+//
+//        mCodeScanner.setDecodeCallback(new DecodeCallback() {
+//            @Override
+//            public void onDecoded(@NonNull final Result result) {
+//                // Handle the decoded result
+//                Log.d(TAG, "Scanned: " + result.getText());
+//            }
+//        });
+//
+//        mCodeScanner.setErrorCallback(new ErrorCallback() {
+//            @Override
+//            public void onError(@NonNull Throwable thrown) {
+//                Log.e(TAG, "Error: " + thrown.getMessage());
+//            }
+//        });
+//
+//        checkCameraPermission(context);
+//    }
+
+    private void checkCameraPermission(Context context) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            startScanning();
+        } else {
+            requestCameraPermission(context);
+        }
+    }
+
+    private void requestCameraPermission(final Context context) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.CAMERA)) {
+            Snackbar.make(mScannerView, "Нужно ваше разрешение на использование камеры", Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ActivityCompat.requestPermissions((Activity) context,
+                                    new String[]{Manifest.permission.CAMERA},
+                                    CAMERA_PERMISSION_REQUEST_CODE);
+                        }
+                    }).show();
+        } else {
+            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startScanning();
+            }
+        }
+        else super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void startScanning() {
+        mCodeScanner.startPreview();
     }
 }

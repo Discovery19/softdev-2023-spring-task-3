@@ -4,16 +4,17 @@ import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.FrameLayout;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -21,37 +22,33 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Favourite_cards extends AppCompatActivity {
-    FirebaseFirestore db;
+
+public class MainFragment extends Fragment {
     RecyclerView recyclerView;
-    RecyclerAdapter recyclerAdapter;
-    FrameLayout frameLayout;
+    main_barcode_adapter adapter;
+    FirebaseFirestore db;
     List<String> names = new ArrayList<>();
     List<String> codes = new ArrayList<>();
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_favourite_cards);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        db = FirebaseFirestore.getInstance();
-//        names = new ArrayList<>();
-//        names.add("");
-//        codes = new ArrayList<>();
-        recyclerView = findViewById(R.id.cards);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        frameLayout = findViewById(R.id.barcode_frame);
-        recyclerAdapter = new RecyclerAdapter(this);
-        recyclerAdapter.setContext(this);// добавленная строка
-        initMovies();
+    String user_name;
+    public MainFragment(String user_name){
+        this.user_name=user_name;
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view=inflater.inflate(R.layout.fragment_main, container, false);
+        recyclerView=view.findViewById(R.id.additional_main_recycler);
+        db = FirebaseFirestore.getInstance();
+        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        adapter = new main_barcode_adapter(view.getContext());
+        adapter.setContext(view.getContext());
+        initMovies();
+        return view;
+    }
     private void initMovies() {
         System.out.println("4");
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        db.collection(auth.getCurrentUser().getEmail())
+        db.collection(user_name)
                 .document("card").collection("card_collection")
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -68,9 +65,10 @@ public class Favourite_cards extends AppCompatActivity {
                             }
                             Log.d(TAG, names.toString());
                             if (!names.isEmpty() && !codes.isEmpty()) {
-                                recyclerAdapter.updateMovieList(names);
-                                recyclerAdapter.updateCodeList(codes);
-                                recyclerView.setAdapter(recyclerAdapter);
+                                adapter.updateMovieList(names);
+                                adapter.updateCodeList(codes);
+                                System.out.println("suka blyat");
+                                recyclerView.setAdapter(adapter);
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -78,4 +76,5 @@ public class Favourite_cards extends AppCompatActivity {
                     }
                 });
     }
-    }
+
+}

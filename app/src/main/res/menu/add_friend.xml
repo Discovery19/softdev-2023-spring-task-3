@@ -4,7 +4,7 @@
 <item
     android:title="add_contact"
     app:showAsAction="always"
-    android:icon="@mipmap/add_friend"
+    android:icon="@drawable/add_friend"
     android:id="@+id/friend_request">
 </item>
 </menu>

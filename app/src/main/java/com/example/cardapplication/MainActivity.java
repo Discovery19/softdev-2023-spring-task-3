@@ -2,85 +2,94 @@ package com.example.cardapplication;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cardapplication.R.id;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-public class MainActivity extends Menu implements Adapter.ItemClickListener {
-    FrameLayout frameLayout;
-    CardFragment cardFragment;
-    RecyclerView recyclerView;
-    MainAdapter adapter;
-    List<Object> list;
-    FirebaseFirestore db;
 
-    String[] catNames ={
-            "Рыжик", "Барсик", "Мурзик", "Мурка", "Васька",
-            "Томасина", "Кристина", "Пушок", "Дымка", "Кузя",
-            "Китти", "Масяня", "Симба"};
+public class MainActivity extends Menu {
+    RecyclerView recyclerView;
+    private static final long DOUBLE_BACK_PRESS_TIME = 2000;
+
+    private long backPressTime=0;
+    MainAdapter adapter;
+    List<String> names = new ArrayList<>();
+    FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setIcon(R.drawable.title_icon);
         recyclerView = findViewById(id.recyclerView);
-        db=FirebaseFirestore.getInstance();
-//        setCollection();
+        db = FirebaseFirestore.getInstance();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        adapter = new MainAdapter(this);
+        adapter.setContext(this);
         eventChangeListener();
     }
+    @Override
+    public void onBackPressed() {
+        if (backPressTime + DOUBLE_BACK_PRESS_TIME > System.currentTimeMillis()) {
+            super.onBackPressed();
+            finish();
+            Intent intent = new Intent(this, Welcome.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(this, "Нажмите еще раз, чтобы выйти", Toast.LENGTH_SHORT).show();
+            backPressTime = System.currentTimeMillis();
+        }
+    }
 
-    public void  eventChangeListener() {
-        FirebaseAuth auth=FirebaseAuth.getInstance();
-        db.collection(auth.getCurrentUser().getEmail())
-                .document("friends").collection("friends_collection")
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+    public void eventChangeListener() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        db.collection(auth.getCurrentUser().getEmail()).document("friends").collection("friends_collection").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    List<String> list = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        list.add(document.getId());
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                        adapter = new MainAdapter(getApplicationContext(), list);
+                    names = new ArrayList<>();
+                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                        if (!document.getId().endsWith("test")) {
+                            names.add(document.getId());
+                            System.out.println(document.getString(document.getId()));
+                        }
+                    }
+                    Log.d(TAG, names.toString());
+                    if (!names.isEmpty()) {
+                        adapter.updateMovieList(names);
                         recyclerView.setAdapter(adapter);
                     }
-                    Log.d(TAG, list.toString());
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
             }
         });
     }
+
     public void startFavourite(View view) {
         Intent intent = new Intent(this, Favourite_cards.class);
         startActivity(intent);
     }
+
     public void startScanner(View view) {
         Intent intent = new Intent(this, Scanner.class);
         startActivity(intent);
@@ -89,18 +98,5 @@ public class MainActivity extends Menu implements Adapter.ItemClickListener {
     public void startMenu(View view) {
         Intent intent = new Intent(this, LogOut.class);
         startActivity(intent);
-    }
-
-    public void setFragment(Fragment fragment) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.framelayout, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        setFragment(cardFragment);
-        Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 }

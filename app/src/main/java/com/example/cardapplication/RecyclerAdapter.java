@@ -1,38 +1,45 @@
 package com.example.cardapplication;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.List;
 
-public class RecyclerAdapter  extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
+public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
 
     List<String> movieList;
     List<String> codes;
     private LayoutInflater mInflater;
     Context context;
-    public RecyclerAdapter(Context context){
+
+    public RecyclerAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
     }
-    public void setContext(Context context){
-        this.context=context;
+
+    public void setContext(Context context) {
+        this.context = context;
     }
+
     public void updateMovieList(List<String> movieList) {
         this.movieList = movieList;
     }
-    public void updateCodeList(List<String> codes) {this.codes = codes;}
+
+    public void updateCodeList(List<String> codes) {
+        this.codes = codes;
+    }
 
     @NonNull
     @Override
@@ -44,18 +51,19 @@ public class RecyclerAdapter  extends RecyclerView.Adapter<RecyclerAdapter.MyVie
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         String string = movieList.get(position);
-        int pos=position;
+        int pos = position;
         holder.textView.setText(string);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    AppCompatActivity activity=(AppCompatActivity)context;
-                    BarcodeFragment barcodeFragment=new BarcodeFragment(codes.get(pos));
-                    activity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.barcode_frame,barcodeFragment).addToBackStack(null).commit();
+                AppCompatActivity activity = (AppCompatActivity) context;
+                BarcodeFragment barcodeFragment = new BarcodeFragment(codes.get(pos), movieList.get(pos));
+                activity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.barcode_frame, barcodeFragment).addToBackStack(null).commit();
             }
         });
     }
+
     @Override
     public int getItemCount() {
         return movieList.size();
@@ -73,6 +81,7 @@ public class RecyclerAdapter  extends RecyclerView.Adapter<RecyclerAdapter.MyVie
             imageButton = itemView.findViewById(R.id.table_menu);
             imageButton.setOnClickListener(this);
         }
+
         @Override
         public void onClick(View v) {
             showPopupMenu(v);
@@ -88,12 +97,15 @@ public class RecyclerAdapter  extends RecyclerView.Adapter<RecyclerAdapter.MyVie
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.action_rename:
-                    Log.d(TAG, "onMenuItemClick: action_popup_rename @ " + getAdapterPosition());
-                    //доделать
-                    return true;
                 case R.id.action_delete:
-                    Log.d(TAG, "onMenuItemClick: action_popup_delete @ " + getAdapterPosition());
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    String documentId = movieList.get(getAdapterPosition());
+
+                    db.collection(auth.getCurrentUser().getEmail())
+                            .document("card").collection("card_collection").document(documentId)
+                            .delete();
+                    System.out.println("удалилась эта хуета");
                     return true;
                 default:
                     return false;

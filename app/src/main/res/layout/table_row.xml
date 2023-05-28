@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="3dp">
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_recycler"
+    >
 
     <TextView
         android:id="@+id/table_name"
@@ -17,8 +19,12 @@
         android:layout_marginStart="10dp"
         android:gravity="start"
         android:hint="text view"
-        android:textColor="@color/white"
-        android:textSize="24sp"
+        android:textColor="#747474"
+        android:textSize="21sp"
+        android:textStyle="bold"
+        android:paddingVertical="7dp"
+        android:paddingHorizontal="2dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,6 +37,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/roundcorner"
         app:srcCompat="@drawable/baseline_menu_24" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

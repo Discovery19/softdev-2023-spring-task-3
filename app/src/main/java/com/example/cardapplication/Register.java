@@ -1,8 +1,5 @@
 package com.example.cardapplication;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,19 +10,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Register extends AppCompatActivity {
@@ -49,6 +42,7 @@ public class Register extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_register);
         mAuth = FirebaseAuth.getInstance();
         editTextemail = findViewById(R.id.email);
@@ -72,50 +66,46 @@ public class Register extends AppCompatActivity {
             if (password.isEmpty())
                 Toast.makeText(Register.this, "Enter password", Toast.LENGTH_SHORT).show();
 
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        progressBar.setVisibility(View.GONE);
-                        if (task.isSuccessful()) {
-                            Toast.makeText(Register.this, "Authentication success.",
-                                    Toast.LENGTH_SHORT).show();
-                            SharedPreferences sharedPreferences =  getSharedPreferences("Login", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor=sharedPreferences.edit();
-                            editor.putBoolean("loginCheck",true).commit();
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                            addToUsersList(email);
-                        } else {
-                            Toast.makeText(Register.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                progressBar.setVisibility(View.GONE);
+                if (task.isSuccessful()) {
+                    Toast.makeText(Register.this, "Authentication success.", Toast.LENGTH_SHORT).show();
+                    SharedPreferences sharedPreferences = getSharedPreferences("Login", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("loginCheck", true).commit();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    addToUsersList(email);
+                } else {
+                    Toast.makeText(Register.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
-    private  void addToUsersList(String email){
-        Map<String, Boolean> info=new HashMap<>();
-        info.put("test_friend",true);
-        FirebaseFirestore db=FirebaseFirestore.getInstance();
-        db.collection(email).document("friends")
-                .collection("friends_collection").add(info).addOnSuccessListener(new OnSuccessListener (){
-                    @Override
-                    public void onSuccess(Object o) {
-                        System.out.println("зарегистрирован + создан файл");
-                        Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
-                    }
-    });
-        Map<String, Integer> card=new HashMap<>();
-        card.put("test_friend",123456);
-        db.collection(email).document("card")
-                .collection("card_collection").add(card).addOnSuccessListener(new OnSuccessListener (){
-                    @Override
-                    public void onSuccess(Object o) {
-                        System.out.println("зарегистрирован + создан файл");
-                        Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
-                    }
-                });
-        Map<String,Boolean> user=new HashMap<>();
-        user.put(email,true);
+
+    private void addToUsersList(String email) {
+        Map<String, Boolean> info = new HashMap<>();
+        info.put("test_friend", true);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(email).document("friends").collection("friends_collection").document("test").set(info).addOnSuccessListener(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
+                System.out.println("зарегистрирован + создан файл");
+                Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Map<String, Integer> card = new HashMap<>();
+        card.put("test_friend", 123456);
+        db.collection(email).document("card").collection("card_collection").document("test").set(card).addOnSuccessListener(new OnSuccessListener() {
+            @Override
+            public void onSuccess(Object o) {
+                System.out.println("зарегистрирован + создан файл");
+                Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Map<String, Boolean> user = new HashMap<>();
+        user.put(email, true);
         db.collection("users").document(email).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
@@ -123,5 +113,5 @@ public class Register extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
             }
         });
-}
+    }
 }
