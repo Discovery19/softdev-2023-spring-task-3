@@ -4,19 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CardSave">
+    tools:context=".Camera_Fragment">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout"
+            android:layout_width="280dp"
+            android:layout_height="140dp"
             android:layout_marginStart="65dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginTop="280dp"
             android:layout_marginEnd="65dp"
-            android:layout_marginBottom="150dp"
+            android:layout_marginBottom="50dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,22 +29,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Введите название карты"
-                android:textColor="#747474"
                 android:inputType="textPersonName"
-                android:textSize="20dp"
-                android:textStyle="bold"
                 android:textAlignment="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <EditText
-                android:id="@+id/card_numb_fragment"
-                android:textSize="20dp"
-                android:textStyle="bold"
                 android:textColor="#747474"
-                android:textAlignment="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -53,24 +43,36 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="3dp">
+
                 <Button
                     android:id="@+id/dontSave_fragment"
-                    android:textColor="#747474"
                     android:layout_width="0px"
-                    android:layout_weight="2"
                     android:layout_height="wrap_content"
-                    android:text="BACK" />
+                    android:layout_weight="2"
+                    android:text="BACK"
+                    android:textColor="#747474" />
+
                 <Button
                     android:id="@+id/saveButton_fragment"
                     android:layout_width="0px"
-                    android:layout_weight="3"
-                    android:textColor="#747474"
                     android:layout_height="wrap_content"
-                    android:text="SAVE" />
+                    android:layout_weight="3"
+                    android:text="SAVE"
+                    android:textColor="#747474" />
 
 
             </TableRow>
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageView_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:src="@drawable/common_google_signin_btn_icon_dark_normal_background"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

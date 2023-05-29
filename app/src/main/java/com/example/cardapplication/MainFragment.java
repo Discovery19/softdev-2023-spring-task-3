@@ -47,7 +47,6 @@ public class MainFragment extends Fragment {
         return view;
     }
     private void initMovies() {
-        System.out.println("4");
         db.collection(user_name)
                 .document("card").collection("card_collection")
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -60,14 +59,12 @@ public class MainFragment extends Fragment {
                                 if (!document.getId().endsWith("test")) {
                                     names.add(document.getId());
                                     codes.add(document.getString(document.getId()));
-                                    System.out.println(document.getString(document.getId()));
                                 }
                             }
                             Log.d(TAG, names.toString());
                             if (!names.isEmpty() && !codes.isEmpty()) {
                                 adapter.updateMovieList(names);
                                 adapter.updateCodeList(codes);
-                                System.out.println("suka blyat");
                                 recyclerView.setAdapter(adapter);
                             }
                         } else {

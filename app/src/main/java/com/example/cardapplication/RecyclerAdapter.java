@@ -105,7 +105,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
                     db.collection(auth.getCurrentUser().getEmail())
                             .document("card").collection("card_collection").document(documentId)
                             .delete();
-                    System.out.println("удалилась эта хуета");
                     return true;
                 default:
                     return false;

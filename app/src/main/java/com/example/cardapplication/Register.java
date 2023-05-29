@@ -91,7 +91,6 @@ public class Register extends AppCompatActivity {
         db.collection(email).document("friends").collection("friends_collection").document("test").set(info).addOnSuccessListener(new OnSuccessListener() {
             @Override
             public void onSuccess(Object o) {
-                System.out.println("зарегистрирован + создан файл");
                 Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
             }
         });
@@ -100,7 +99,6 @@ public class Register extends AppCompatActivity {
         db.collection(email).document("card").collection("card_collection").document("test").set(card).addOnSuccessListener(new OnSuccessListener() {
             @Override
             public void onSuccess(Object o) {
-                System.out.println("зарегистрирован + создан файл");
                 Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
             }
         });
@@ -109,7 +107,6 @@ public class Register extends AppCompatActivity {
         db.collection("users").document(email).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                System.out.println("вроде + юзер");
                 Toast.makeText(getApplicationContext(), "зарегистрирован + создан файл", Toast.LENGTH_SHORT).show();
             }
         });

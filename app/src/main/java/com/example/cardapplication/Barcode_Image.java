@@ -17,6 +17,7 @@ public class Barcode_Image extends AppCompatActivity {
     Barcode_Image(String code){
         this.code=code;
     }
+    Barcode_Image(){}
     MultiFormatWriter multiFormatWriter=new MultiFormatWriter();
     ImageView imageView;
     @Override

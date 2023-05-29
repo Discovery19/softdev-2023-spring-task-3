@@ -37,19 +37,15 @@ public class Favourite_cards extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         db = FirebaseFirestore.getInstance();
-//        names = new ArrayList<>();
-//        names.add("");
-//        codes = new ArrayList<>();
         recyclerView = findViewById(R.id.cards);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         frameLayout = findViewById(R.id.barcode_frame);
         recyclerAdapter = new RecyclerAdapter(this);
-        recyclerAdapter.setContext(this);// добавленная строка
+        recyclerAdapter.setContext(this);
         initMovies();
     }
 
     private void initMovies() {
-        System.out.println("4");
         FirebaseAuth auth = FirebaseAuth.getInstance();
         db.collection(auth.getCurrentUser().getEmail())
                 .document("card").collection("card_collection")

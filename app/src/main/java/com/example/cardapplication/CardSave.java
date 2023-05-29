@@ -1,8 +1,6 @@
 package com.example.cardapplication;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,18 +25,16 @@ public class CardSave extends Fragment {
     }
     Button save,back;
     EditText cardCode,cardName;
-    SharedPreferences sharedPreferences;
     String nameString,codeString;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_card_save, container, false);
-        back=v.findViewById(R.id.dontSave);
-        cardCode = v.findViewById(R.id.card_numb);
-        cardName = v.findViewById(R.id.card_name);
-        save = v.findViewById(R.id.saveButton);
+        back=v.findViewById(R.id.dontSave_fragment);
+        cardCode = v.findViewById(R.id.card_numb_fragment);
+        cardName = v.findViewById(R.id.card_name_fragment);
+        save = v.findViewById(R.id.saveButton_fragment);
         cardCode.setText(string);
-        sharedPreferences= getActivity().getSharedPreferences("My user",Context.MODE_PRIVATE);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,7 +59,8 @@ public class CardSave extends Fragment {
         FirebaseFirestore db=FirebaseFirestore.getInstance();
         Map<String,String> map=new HashMap<>();
         map.put(nameString,codeString);
-        db.collection(email).document("card").collection("card_collection").document(nameString).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection(email).document("card").collection("card_collection")
+                .document(nameString).set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Toast.makeText(getActivity(), "ура победа должны появиться карты", Toast.LENGTH_LONG).show();
